@@ -30,7 +30,7 @@ let currentQuestionIndex = 0;
 const goats = {
 	messi: {
 	name: "Lionel Messi",
-	profilePic: "galleryimg/4messi.jpg",
+	profilePic: "galleryImg/4messi.jpg",
 	videoReward: false,
 	questions: [
 		{
@@ -71,7 +71,7 @@ const goats = {
 	
 	cr7: {
 		name: "Cristiano Ronaldo",
-		profilePic: "galleryimg/2cr7.jpg",
+		profilePic: "galleryImg/2cr7.jpg",
 		videoReward: "GoatCelebration/0.mp4",
 		questions: [
 			{
