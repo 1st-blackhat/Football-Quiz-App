@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic-Tac-Toe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  
+<style>
+	
+	:root {
+  --btn: 1rem;
+  --white: #ffffff;
+  --black: #121212;
+  --blue: #4862eb;
+  --chrome: #f6f3fd;
+  --ripple: rgba(0,0,0,0.3);
+  --text-color: #F1F3F6;
+  --background: #1A1E2A;
+  --cards-color: #0e101c;
+}
+
+/* Modern browsers (Firefox/Chrome) */
+/* html {
+  scrollbar-color: aqua #121212; 
+  scrollbar-width: thin;
+} */
+
+/* 1. Standard properties for Firefox and modern Chrome/Edge */
+html {
+  border-radius: 25px;
+  scrollbar-color: transparent;
+  scrollbar-width: thin;
+}
+
+/* 2. Webkit-specific properties (Chrome, Safari, Edge, Opera) */
+/* The entire scrollbar area */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+/* The background of the scrollbar (the track) */
+::-webkit-scrollbar-track {
+  width: 5px;
+  height: 5px;
+  background: transparent;
+  border-radius: 25px;
+}
+
+/* The draggable part of the scrollbar (the thumb) */
+::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+/* The thumb when you hover over it */
+::-webkit-scrollbar-thumb:hover {
+  background: transparent;
+}
+
+/* 1. BASE STYLES & RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Montserrat';
+}
+
+body {
+  line-height: 1.6;
+  color: var(--white);
+  background-color: #1A1E2A;
+}
+
+#header {
+  top: 0;
+  padding: 0;
+  z-index: 200;
+  width: 100%;
+  height: 70px;
+  display: grid;
+  position: sticky;
+  margin-bottom: 40px;
+  place-items: center;
+  font-family: 'Inter';
+  background: var(--background);
+}
+
+#header.collapsed {
+  z-index: 300;
+  border-bottom: 1px solid white;
+}
+
+.logo {
+  margin: 0;
+  opacity: 1;
+  color: #F1F3F6;
+  text-align: center;
+  line-height: 1.2;
+  position: absolute;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  will-change: transform, opacity;
+  transition: transform 0.8s ease, opacity 0.8s ease;
+}
+
+/* Expanded logo */
+.logo.expanded {
+  opacity: 1;
+  font-size: 35px;
+  transform: translateY(0) scale(1);
+}
+
+/* Collapsed logo */
+.logo.collapsed {
+  opacity: 0;
+  font-size: 20px;
+  transform: translateY(-10px) scale(0.95);
+}
+
+/* When header collapses */
+#header.collapsed .expanded {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.95);
+}
+
+#header.collapsed .collapsed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* 2. GALLERY SCENE (The 4-Column Grid) */
+#goat-grid {
+  gap: 90px;
+  display: flex;
+  margin: 0 auto;
+  max-width: 1200px;
+  border-radius: 25px;
+  flex-direction: column;
+  padding: 10px 10px 30px 10px;
+  background: var(--cards-color);
+}
+
+.goat-card {
+  display: flex;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid black;
+  transition: transform 0.3s ease;
+}
+
+.goat-card:hover {
+  transform: scale(1.05);
+}
+
+/* The Featured (Goat) Logic */
+.goat-card.featured {
+  width: 350px;
+  height: 400px;
+  flex-shrink: 0;
+}
+
+.goat-card:not(.featured) {
+	width: 100px;
+  height: 140px;
+  flex-shrink: 0;
+}
+
+.goat-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.goat-card h3 {
+  height: 30%;
+  padding: 5px;
+  display: none;
+  font-size: 0.9rem;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 3. QUIZ ENGINE SCENE */
+.quiz-container {
+  padding: 20px;
+  margin: 0 auto;
+  max-width: 700px;
+  text-align: center;
+  border-radius: 20px;
+  background: var(--cards-color);
+}
+
+#question-text {
+	font-weight: 700;
+	font-size: 1.2rem;
+	text-align: center;
+	padding: 20px 10px;
+	border-radius: 25px;
+  letter-spacing: 1px;
+  margin-bottom: 25px;
+  color: var(--text-color);
+  background: var(--background);
+}
+
+.media-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.media-box img {
+  width: 60%;
+  height: 200px;
+  max-height: 350px;
+  object-fit: cover;
+  border-radius: 12px;
+  object-position: top;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* Container for the options */
+#options-container {
+  gap: 15px;
+  left: 50%;
+  width: 90%;
+  bottom: 15px;
+  display: grid;
+  position: fixed;
+  margin-top: 20px;
+  padding: 35px 20px;
+  border-radius: 25px;
+  transform: translateX(-50%);
+  background: var(--cards-color);
+  grid-template-columns: 1fr 1fr;
+}
+
+.option-btn {
+  padding: 0;
+  border: none;
+  display: flex;
+  height: 150px;
+  overflow: hidden;
+  border-radius: 20px;
+  color: var(--white);
+  align-items: center;
+  justify-content: center;
+  background: var(--background);
+}
+
+.option-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  pointer-events: none;
+  transition: transform 0.3s ease;
+}
+
+/* Hover effect for image options */
+.option-btn:hover img {
+  transform: scale(1.1);
+}
+
+/* FEEDBACK & INTERACTION */
+.correct {
+  color: #fff !important;
+  background-color: #0e6f41 !important;
+}
+
+.wrong {
+  border-color: #900 !important;
+  background-color: #FF4444 !important;
+}
+
+.no-click {
+  pointer-events: none;
+}
+
+/* 4. RESULT SCENE & VIDEO */
+#result-scene {
+  padding: 0;
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+  text-align: center;
+}
+
+.video-wrapper {
+  margin: 0;
+  width: 100vw;
+  height: 100dvh;
+  outline: 1px solid red;
+}
+
+video {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 0;
+  outline: 1px solid blue;
+  object-fit: cover;
+}
+
+.score-card h2 {
+	z-index: 2; 
+  margin-bottom: 20px;
+  font-size: 2.2rem;
+}
+
+button.retry-btn {
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 5px;
+  padding: 15px 30px;
+  background: #FFD700;
+}
+
+#logoWrap {
+  width: 100%;
+  color: #F1F3F6;
+  display: flex;
+  padding: 0;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+#overlay {
+  top: 0;
+  left: 0;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  display: none;
+  position: fixed;
+  backdrop-filter: blur(0.15px);
+  background: rgba(0, 0, 0, 0.45);
+}
+
+#cta {
+  gap: 20px;
+  width: 100%;
+  color: #F1F3F6;
+  display: flex;
+  font-size: 0.7rem;
+  margin-top: 50px;
+  border-radius: 25px;
+  align-content: center;
+  justify-content: center;
+  flex-direction: column;
+  background-color: #12141A;
+  padding: 20px 0 20px 20px;
+}
+
+#cta span {
+  animation: fadeIn 2.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+#imageDiv {
+  width: 100%;
+  height: 380px;
+  display: flex;
+  overflow-x: auto;
+  align-items: center;
+  padding: 0 10px 0 0;
+}
+
+#imageDiv img {
+  width: 250px;
+  height: 100%;
+  flex-shrink: 0;
+  border-radius: 25px;
+  object-fit: contain;
+}
+
+#playNow {
+  border: none;
+  margin-top: 20px;
+  font-size: 0.7rem;
+  border-radius: 35px;
+  padding: 20px 40px;
+}
+
+#topGoats {
+  gap: 25px;
+  display: flex;
+  padding: 0;
+  border-radius: 25px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+#playNow2 {
+  border: none;
+  margin: 0 auto;
+  cursor: pointer;
+  user-select: none;
+  max-width: 160px;
+  font-size: 0.6rem;
+  border-radius: 35px;
+  padding: 20px 30px;
+}
+
+#goats {
+  gap: 20px;
+  display: flex;
+  overflow-x: auto;
+}
+
+.subGoat {
+  gap: 50px;
+  padding: 50px 20px;
+  display: flex;
+  margin-top: 70px;
+  border-radius: 25px;
+  background: var(--cards-color);
+  flex-direction: column;
+}
+
+.heads-up {
+  top: 10px;
+  left: 50%;
+  z-index: 1500;
+  display: none;
+  padding: 35px;
+  font-weight: 800;
+  font-size: 1rem;
+  position: fixed;
+  color: var(--text-color);
+  border-radius: 25px;
+  background: var(--cards-color);
+  transform: translateX(-50%);
+}
+
+#scoreBoard {
+  top: 5px;
+  right: 10px;
+  height: 20px;
+  min-width: 20px;
+  position: absolute;
+  color: var(--text-color);
+  border-radius: 50%;
+  background: var(--cards-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#scoreBoard.correct2 {
+  color: var(--black);
+  background: #50f6a8;
+}
+
+.score-card {
+  width: 90%;
+  padding: 35px;
+  position: relative;
+  text-align: center;
+  border-radius: 25px;
+  background: var(--cards-color);
+}
+
+.shimmer-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none; /* Ensures shimmer doesn’t block clicks */
+  
+  background: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 20%,
+    rgba(255, 255, 255, 0.02) 40%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0.08) 60%,
+    rgba(255, 255, 255, 0) 80%
+  );
+  
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite linear;
+  border-radius: inherit; /* Follows score-card’s rounded shape */
+}
+
+/* smoother shimmer animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+	
+	/* --- DESKTOP: FIXED GOOGLE SIGN-IN CARD STYLE --- */
+@media (min-width: 700px) {
+  body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--background) !important;
+  }
+
+  /* 1. APPLY EXACT CONSISTENT DIMENSIONS TO ALL SECTIONS */
+  #welcomePage, #gallery-scene, #quiz-scene, #result-scene {
+    margin: auto;
+    display: none;
+    position: relative;
+    overflow-x: hidden;
+    border-radius: 25px !important;
+    width: 450px !important;
+    height: 750px !important;
+    padding: 0 20px !important;
+    background: var(--cards-color) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+  }
+
+  /* 2. PRESERVE HORIZONTAL SCROLLING (JUST LIKE MOBILE) */
+  #imageDiv, #topGoats, #goats {
+    gap: 15px;
+    padding-bottom: 10px;
+    display: flex !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .quiz-container {
+    margin-top: 20px !important;
+  }
+
+  /* 3. FIX QUIZ OPTIONS POSITIONING INSIDE THE CARD */
+  #options-container {
+    bottom: 20px !important;
+    left: 20px !important;
+    width: calc(100% - 40px) !important;
+    position: absolute !important;
+    transform: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  #scoreBoard {
+    background: var(--background);
+  }
+
+  #imageDiv img {
+  	object-fit: cover;
+  	object-position: top;
+  }
+  
+ .heads-up {
+  	position: absolute !important;
+  }
+
+  #nowPlayin {
+    font-size: 0.65rem;
+    position: absolute !important;
+    background: var(--background);
+  }
+
+  #header {
+    background: var(--cards-color);
+  }
+
+  #cta {
+    background: #0E1018;
+  }
+
+  #cta span {
+    font-size: 0.9rem !important;
+  }
+
+  #welcomePage {
+    background: #12141A;
+  }
+
+  /* 4. RESULT SCENE: FIXED HEIGHT VIDEO & OVERLAY */
+  #result-scene {
+    padding: 0 !important;
+  }
+
+  #video-wrapper, #video-wrapper video {
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute;
+    border-radius: 25px;
+    object-fit: cover;
+  }
+
+  #score-container {
+    top: 0;
+    left: 0;
+    display: none;
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute !important;
+    align-items: center;
+    justify-content: center;
+    background: var(--cards-color) !important;
+    z-index: 20;
+  }
+  
+  .shimmer-wrap {
+  	display: none;
+  }
+
+  /* 5. CHILDREN DIMENSION ADJUSTMENTS */
+  #logoWrap {
+    margin-top: 45px !important;
+    justify-content: center !important;
+  }
+
+  .media-box img {
+    max-height: 250px !important;
+  }
+}
+
+/* SECTION LAYOUTS */
+#welcomePage {
+  width: 100%;
+  height: 100vh;
+  padding: 20px 10px 0 10px;
+  display: flex;
+  background: #1A1E2A;
+  flex-direction: column;
+  align-items: center;
+}
+
+#gallery-scene {
+  display: none;
+  position: relative;
+  padding: 0 10px 30px 10px;
+}
+
+#quiz-scene {
+  width: 100%;
+  margin: 0;
+  display: none;
+  height: 100vh;
+  position: relative;
+  overflow-y: hidden;
+  padding: 25px 10px 15px 10px;
+}
+
+#score-container {
+  z-index: 20;
+  display: none;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+/*  Utilities  */
+#nowPlayin {
+  z-index: 290;
+  opacity: 0;
+  position: fixed;
+  right: 2px;
+  top: 10px;
+  padding: 2px 15px;
+  color: var(--text-color);
+  line-height: 14px;
+  background: #12141A;
+  font-size: 0.5rem;
+  transition: opacity 0.8s, transform 0.8s;
+  clip-path: polygon(10% 0%, 100% 2%, 90% 100%, 0% 100%);
+}
+
+#nowPlayin.fade-out {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+#nowPlayin.fade-in {
+  opacity: 1;
+  transform: translateX(-3%);
+}
+
+#sentinel {
+  margin-top: 40px;
+}
+	
+</style>
+</head>
+<body>
+	
+	<section id="welcomePage"> 
+	
+	<div id="logoWrap">
+	<span id="logo" style="font-size: 25px;">footballQuiz</span>
+	</div>
+	
+	<div id="cta"> 
+	<span>Think you know your GOATs? Prove it!</span>
+	<div id="imageDiv">
+	<img src="galleryImg/screenshot 1.jpg" style="border-radius: 25px;">
+	<img src="galleryImg/screenshot 2.jpg">
+	<img src="galleryImg/screenshot 3.jpg">
+	
+	</div>
+		
+	</div>
+	
+	<button id="playNow" onclick="startGame()">play now</button>
+	
+	</section>
+	
+	<section id="gallery-scene">
+		
+		<div id="sentinel"></div>
+		<header id="header">
+       <h1 class="logo expanded">Select Your <br>GOAT</h1>
+       <h1 class="logo collapsed">Select Your GOAT</h1>
+      </header>
+        
+        <div id="goat-grid">
+        	<div id="topGoats"></div>
+        	<button id="playNow2" onclick="message()">select to play</button>
+            </div>
+            
+            <div class="subGoat">
+            	
+            <div id="goats"></div>
+            
+            <button id="playNow2" onclick="message()">select to play
+            </button>
+            </div>
+            
+            <div class="heads-up">
+            	<span style="text-align: center; text-wrap: nowrap;">Select a Goat to play!</span>
+            </div>
+            
+            <div id="nowPlayin">
+            	🎵 Now Playing<br>  
+              - unknown artist</div>
+    </section>
+
+    <section id="quiz-scene">
+    	
+    	<div id="scoreBoard"></div>
+    	
+        <div class="quiz-container">
+            <h2 id="question-text">Question Loading...</h2> 
+            
+            <div class="media-box">
+                <img id="question-image" src="" alt="Quiz Visual">
+            </div>
+        </div>
+        
+        <div id="options-container">
+                </div>
+    </section>
+    
+    <section id="result-scene" style="display: none; ">
+    <div class="video-wrapper" id="video-wrapper">
+        <video id="reward-video" playsinline autoplay muted>
+            <source src="" type="video/mp4">
+        </video>
+    </div> 
+
+    <div id="score-container">
+        <div class="score-card">
+            <h2 id="final-score"></h2>
+            <button id="playNow2" onclick="reRun()" style="margin-top: 55px;  z-index: 2;">Try Another GOAT</button>
+        </div>
+    </div>
+</section>
+    
+    <div id="overlay"><div class="shimmer-wrap"></div></div>
+    
+    <audio id="bg-music" loop>
+    <source src="audio/All I Know.m4a" type="audio/mpeg" >
+</audio>
+
+<audio id="result-music">
+    <source src="audio/this one's different.m4a" type="audio/mpeg" data-audioTitle-1="all i know by Rudimental" >
+</audio>
+	
+	<script src="footballQuiz.js" defer=""></script>
+
+</body>
+</html>
